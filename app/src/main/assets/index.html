@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kanchan Jewellers</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 20px 16px 40px; font-family: system-ui, sans-serif; color: #1a1a1a;
+         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh; }
+  h1 { text-align: center; font-family: Georgia, serif; font-size: min(1.9rem, 8vw); margin: 0 0 4px; white-space: nowrap; }
+  .sub { text-align: center; color: #B8860B; font-style: italic; margin: 0 0 24px; }
+  .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px;
+          box-shadow: 0 2px 12px rgba(0,0,0,.08); margin-bottom: 16px; }
+  h2 { font-size: 1.15rem; margin: 0 0 12px; }
+  label { display: block; font-size: .9rem; font-weight: 600; margin: 12px 0 4px; }
+  input, select { width: 100%; font-size: 1.1rem; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+  input:focus, select:focus { outline: 2px solid #D4AF37; border-color: #D4AF37; }
+  .info { background: #fdf8e6; border-left: 4px solid #D4AF37; padding: 8px 10px; margin-top: 8px; font-size: .9rem; border-radius: 4px; }
+  button { width: 100%; margin-top: 18px; padding: 14px; font-size: 1.1rem; font-weight: 600; color: #fff;
+           background: linear-gradient(135deg, #D4AF37, #B8860B); border: 0; border-radius: 8px; }
+  .big { font-size: 1.8rem; font-weight: 700; color: #B8860B; }
+  .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #eee; }
+  .row:last-child { border-bottom: 0; }
+  .hidden { display: none; }
+  .err { color: #c0392b; font-weight: 600; }
+</style>
+</head>
+<body>
+<h1>💎 Kanchan Jewellers</h1>
+<p class="sub">Shuddhata Ki Pehchan</p>
+
+<div class="card">
+  <h2>Jewelry Details</h2>
+  <label for="metal">Metal Type</label>
+  <select id="metal"><option>Gold</option><option>Silver</option></select>
+
+  <label for="weight">Weight (grams)</label>
+  <input id="weight" type="number" inputmode="decimal" min="0.01" step="0.01" value="10">
+
+  <div id="goldFields">
+    <label for="carat">Carat Purity</label>
+    <select id="carat"><option value="18">18</option><option value="22" selected>22</option><option value="24">24</option></select>
+    <label for="goldRate">Gold Rate per gram (<span id="caratLabel">22</span>K)</label>
+    <input id="goldRate" type="number" inputmode="decimal" min="0" step="100">
+    <label for="makingPct">Making Charges (%)</label>
+    <input id="makingPct" type="number" inputmode="decimal" min="0" step="0.1" value="12">
+  </div>
+
+  <div id="silverFields" class="hidden">
+    <label for="silverRate">Silver Rate per gram</label>
+    <input id="silverRate" type="number" inputmode="decimal" min="0" step="1" value="190">
+    <label for="makingPerGram">Making Charges (₹ per gram)</label>
+    <input id="makingPerGram" type="number" inputmode="decimal" min="0" step="1" value="25">
+  </div>
+
+  <div class="info" id="rateInfo"></div>
+  <button id="calc">Calculate Final Cost</button>
+</div>
+
+<div class="card hidden" id="result"></div>
+
+<script src="calc.js"></script>
+<script>
+  // Default rates per gram - keep in sync with Gold_price/app.py
+  const GOLD_RATES = { 18: 11450, 22: 13300, 24: 14200 };
+  const $ = id => document.getElementById(id);
+  const inr = (n, d = 2) => "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d });
+  // Remember edited rates per carat, like the web app's per-carat inputs
+  const goldRates = { ...GOLD_RATES };
+
+  function rate() { return parseFloat($("metal").value === "Gold" ? $("goldRate").value : $("silverRate").value) || 0; }
+
+  function refresh() {
+    const gold = $("metal").value === "Gold";
+    $("goldFields").classList.toggle("hidden", !gold);
+    $("silverFields").classList.toggle("hidden", gold);
+    const r = rate();
+    $("rateInfo").textContent = gold
+      ? `📈 Current rate for ${$("carat").value}K gold: ${inr(r, 0)}/gram (${inr(r * 10, 0)}/10g)`
+      : `📈 Current silver rate: ${inr(r)}/gram (${inr(r * 10, 0)}/10g)`;
+    $("result").classList.add("hidden");
+  }
+
+  $("carat").onchange = () => {
+    $("caratLabel").textContent = $("carat").value;
+    $("goldRate").value = goldRates[$("carat").value];
+    refresh();
+  };
+  $("goldRate").oninput = () => { goldRates[$("carat").value] = $("goldRate").value; refresh(); };
+  ["metal", "silverRate", "weight", "makingPct", "makingPerGram"].forEach(id => $(id).oninput = refresh);
+  $("metal").onchange = refresh;
+
+  $("calc").onclick = () => {
+    const metal = $("metal").value;
+    const weight = parseFloat($("weight").value);
+    const r = rate();
+    const pct = parseFloat($("makingPct").value) || 0;
+    const perGram = parseFloat($("makingPerGram").value) || 0;
+    const out = $("result");
+    out.classList.remove("hidden");
+    if (!(weight > 0) || !(r > 0)) {
+      out.innerHTML = '<p class="err">Please enter a valid weight and rate.</p>';
+      return;
+    }
+    const x = calculateFinalCost(weight, metal, r, pct, perGram);
+    const row = (k, v) => `<div class="row"><span>${k}</span><b>${v}</b></div>`;
+    out.innerHTML = `
+      <h2>Price Calculation</h2>
+      <div>Final Amount</div>
+      <div class="big">${inr(x.finalCost)}</div>
+      <div style="margin-bottom:12px">Including GST: ${inr(x.gst)} · You save ${inr(x.discount)} (${x.discountPercent} off making)</div>
+      <h2>Price Breakdown</h2>
+      ${row("Metal", metal + (metal === "Gold" ? ` (${$("carat").value}K)` : ""))}
+      ${row("Weight", weight + " grams")}
+      ${row("Rate", inr(r, metal === "Gold" ? 0 : 2) + "/gram")}
+      ${row("Base Cost", inr(x.baseCost))}
+      ${row("Making Charges", inr(x.making))}
+      ${row("After Discount", inr(x.discounted))}
+      ${row("Before GST", inr(x.beforeGst))}
+      ${row("GST (3%)", inr(x.gst))}
+      ${row("<b>Final Amount</b>", inr(x.finalCost))}`;
+    out.scrollIntoView({ behavior: "smooth" });
+  };
+
+  $("goldRate").value = goldRates[22];
+  refresh();
+</script>
+</body>
+</html>

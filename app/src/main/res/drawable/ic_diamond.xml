@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gold diamond, kept inside the 66dp adaptive-icon safe zone -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#D4AF37" android:pathData="M38,36 L70,36 L80,48 L54,78 L28,48 Z" />
+    <path android:fillColor="#B8860B" android:pathData="M28,48 L80,48 L54,78 Z" />
+    <path android:fillColor="#F3D77A" android:pathData="M46,36 L62,36 L66,48 L42,48 Z" />
+</vector>
