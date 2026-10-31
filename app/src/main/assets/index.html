@@ -5,126 +5,189 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Kanchan Jewellers</title>
 <style>
-  * { box-sizing: border-box; }
-  body { margin: 0; padding: 20px 16px 40px; font-family: system-ui, sans-serif; color: #1a1a1a;
-         background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); min-height: 100vh; }
-  h1 { text-align: center; font-family: Georgia, serif; font-size: min(1.9rem, 8vw); margin: 0 0 4px; white-space: nowrap; }
-  .sub { text-align: center; color: #B8860B; font-style: italic; margin: 0 0 24px; }
-  .card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 16px;
-          box-shadow: 0 2px 12px rgba(0,0,0,.08); margin-bottom: 16px; }
-  h2 { font-size: 1.15rem; margin: 0 0 12px; }
-  label { display: block; font-size: .9rem; font-weight: 600; margin: 12px 0 4px; }
-  input, select { width: 100%; font-size: 1.1rem; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
-  input:focus, select:focus { outline: 2px solid #D4AF37; border-color: #D4AF37; }
-  .info { background: #fdf8e6; border-left: 4px solid #D4AF37; padding: 8px 10px; margin-top: 8px; font-size: .9rem; border-radius: 4px; }
-  button { width: 100%; margin-top: 18px; padding: 14px; font-size: 1.1rem; font-weight: 600; color: #fff;
-           background: linear-gradient(135deg, #D4AF37, #B8860B); border: 0; border-radius: 8px; }
-  .big { font-size: 1.8rem; font-weight: 700; color: #B8860B; }
-  .row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #eee; }
-  .row:last-child { border-bottom: 0; }
-  .hidden { display: none; }
-  .err { color: #c0392b; font-weight: 600; }
+  :root {
+    --ruby: #8B1626; --ruby-dark: #4E0A14; --gold: #C9A44C; --gold-light: #F1DE9C;
+    --navy: #1F2C52; --ivory: #FAF6EE; --ink: #22201C; --muted: #6E665B; --line: #E8E0D2;
+    --green: #1E7B4A; --green-bg: #E5F4EC;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--ink);
+         background: var(--ivory); min-height: 100vh; }
+
+  .hero { background: radial-gradient(120% 90% at 50% 0%, var(--ruby) 0%, var(--ruby-dark) 100%);
+          color: var(--ivory); text-align: center; padding: 22px 16px 64px; }
+  .hero img { width: 92px; height: 92px; filter: drop-shadow(0 6px 14px rgba(0,0,0,.45)); }
+  .hero h1 { font-family: Georgia, "Noto Serif", serif; font-weight: 700; font-size: min(1.85rem, 8vw);
+             margin: 8px 0 2px; letter-spacing: .3px; white-space: nowrap; }
+  .hero p { margin: 0; color: var(--gold-light); font-style: italic; letter-spacing: .6px; font-size: .95rem; }
+
+  main { padding: 0 14px 32px; margin-top: -44px; }
+  .card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 18px 16px;
+          box-shadow: 0 6px 22px rgba(78,10,20,.08); margin-bottom: 14px; }
+  .title { font-family: Georgia, "Noto Serif", serif; font-size: 1.1rem; font-weight: 700; color: var(--ruby-dark);
+           margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .title::before { content: ""; width: 10px; height: 10px; transform: rotate(45deg); background: var(--gold); border-radius: 2px; }
+
+  .seg { display: grid; grid-template-columns: 1fr 1fr; background: #F3EDE2; border-radius: 12px; padding: 4px; gap: 4px; }
+  .seg button, .chips button { border: 0; font: inherit; font-weight: 600; cursor: pointer; }
+  .seg button { padding: 11px; border-radius: 9px; background: transparent; color: var(--muted); font-size: 1rem; }
+  .seg button.on { box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+  .seg button.on[data-v="Gold"] { background: linear-gradient(135deg, #E9CF7E, var(--gold)); color: var(--ruby-dark); }
+  .seg button.on[data-v="Silver"] { background: linear-gradient(135deg, #F4F5F8, #C9CDD6); color: var(--navy); }
+
+  label { display: block; font-size: .85rem; font-weight: 600; color: var(--muted); margin: 14px 0 6px; }
+  .chips { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .chips button { padding: 10px 0; border-radius: 10px; background: #fff; border: 1.5px solid var(--line); color: var(--ink); font-size: 1rem; }
+  .chips button.on { border-color: var(--gold); background: #FBF3DC; color: var(--ruby-dark); }
+
+  .field { display: flex; align-items: center; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; padding: 0 12px; }
+  .field:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,164,76,.18); }
+  .field span { color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .field input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font: inherit;
+                 font-size: 1.15rem; font-weight: 600; padding: 12px 8px; color: var(--ink); }
+  .hint { font-size: .82rem; color: var(--muted); margin-top: 6px; }
+  .hidden { display: none !important; }
+
+  .tiles { display: grid; gap: 12px; margin-bottom: 14px; }
+  .tile { border-radius: 18px; padding: 16px; }
+  .tile .k { font-size: .85rem; opacity: .85; }
+  .tile .v { font-size: 2rem; font-variant-numeric: lining-nums tabular-nums; letter-spacing: -.5px; font-weight: 700; margin: 4px 0 8px; }
+  .tile.final { background: linear-gradient(135deg, var(--ruby) 0%, var(--ruby-dark) 100%); color: #fff;
+                box-shadow: 0 8px 22px rgba(78,10,20,.25); }
+  .tile.final .v { color: var(--gold-light); font-size: 2.3rem; }
+  .tile.save { background: #fff; border: 1px solid var(--line); }
+  .tile.save .v { color: var(--green); }
+  .pill { display: inline-flex; align-items: center; gap: 4px; font-size: .85rem; font-weight: 600; padding: 4px 10px; border-radius: 999px; }
+  .final .pill { background: rgba(241,222,156,.18); color: var(--gold-light); }
+  .save .pill { background: var(--green-bg); color: var(--green); }
+
+  .row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px dashed var(--line); }
+  .row span { color: var(--muted); }
+  .row b { text-align: right; }
+  .row.minus b { color: var(--green); }
+  .row.total { border-bottom: 0; border-top: 2px solid var(--gold); margin-top: 4px; padding-top: 12px; font-size: 1.1rem; }
+  .row.total span, .row.total b { color: var(--ruby-dark); font-weight: 700; }
+  .err { color: var(--ruby); font-weight: 600; text-align: center; margin: 0; }
+  footer { text-align: center; color: var(--muted); font-size: .75rem; padding-bottom: 20px; }
 </style>
 </head>
 <body>
-<h1>💎 Kanchan Jewellers</h1>
-<p class="sub">Shuddhata Ki Pehchan</p>
+<header class="hero">
+  <img src="logo.png" alt="Kanchan Jewellers logo">
+  <h1>Kanchan Jewellers</h1>
+  <p>Shuddhata Ki Pehchan</p>
+</header>
 
-<div class="card">
-  <h2>Jewelry Details</h2>
-  <label for="metal">Metal Type</label>
-  <select id="metal"><option>Gold</option><option>Silver</option></select>
+<main>
+  <section class="card">
+    <h2 class="title">Jewelry Details</h2>
+    <div class="seg" id="metal">
+      <button data-v="Gold" class="on">Gold</button>
+      <button data-v="Silver">Silver</button>
+    </div>
 
-  <label for="weight">Weight (grams)</label>
-  <input id="weight" type="number" inputmode="decimal" min="0.01" step="0.01" value="10">
+    <div id="goldFields">
+      <label>Carat Purity</label>
+      <div class="chips" id="carat">
+        <button data-v="18">18K</button><button data-v="22" class="on">22K</button><button data-v="24">24K</button>
+      </div>
+    </div>
 
-  <div id="goldFields">
-    <label for="carat">Carat Purity</label>
-    <select id="carat"><option value="18">18</option><option value="22" selected>22</option><option value="24">24</option></select>
-    <label for="goldRate">Gold Rate per gram (<span id="caratLabel">22</span>K)</label>
-    <input id="goldRate" type="number" inputmode="decimal" min="0" step="100">
-    <label for="makingPct">Making Charges (%)</label>
-    <input id="makingPct" type="number" inputmode="decimal" min="0" step="0.1" value="12">
-  </div>
+    <label for="weight">Weight</label>
+    <div class="field"><input id="weight" type="number" inputmode="decimal" min="0.01" step="0.01" value="10"><span>grams</span></div>
 
-  <div id="silverFields" class="hidden">
-    <label for="silverRate">Silver Rate per gram</label>
-    <input id="silverRate" type="number" inputmode="decimal" min="0" step="1" value="190">
-    <label for="makingPerGram">Making Charges (₹ per gram)</label>
-    <input id="makingPerGram" type="number" inputmode="decimal" min="0" step="1" value="25">
-  </div>
+    <label for="rate" id="rateLabel">Gold Rate (22K)</label>
+    <div class="field"><span>₹</span><input id="rate" type="number" inputmode="decimal" min="0"><span>/ gram</span></div>
+    <div class="hint" id="rateHint"></div>
 
-  <div class="info" id="rateInfo"></div>
-  <button id="calc">Calculate Final Cost</button>
-</div>
+    <label for="making">Making Charges</label>
+    <div class="field"><span id="makingPre" class="hidden">₹</span><input id="making" type="number" inputmode="decimal" min="0"><span id="makingSuf">%</span></div>
+    <div class="hint" id="makingHint"></div>
+  </section>
 
-<div class="card hidden" id="result"></div>
+  <section id="result"></section>
+</main>
+<footer>Works offline · Prices include 3% GST</footer>
 
 <script src="calc.js"></script>
 <script>
   // Default rates per gram - keep in sync with Gold_price/app.py
   const GOLD_RATES = { 18: 11450, 22: 13300, 24: 14200 };
+  const SILVER_RATE = 190;
+  const MAKING = { Gold: 12, Silver: 25 };  // % for gold, ₹/gram for silver
+
   const $ = id => document.getElementById(id);
   const inr = (n, d = 2) => "₹" + n.toLocaleString("en-IN", { minimumFractionDigits: d, maximumFractionDigits: d });
-  // Remember edited rates per carat, like the web app's per-carat inputs
-  const goldRates = { ...GOLD_RATES };
+  // Edited rates/making are remembered per carat and metal while the app is open
+  const state = { metal: "Gold", carat: "22", rates: { ...GOLD_RATES, Silver: SILVER_RATE }, making: { ...MAKING } };
+  const rateKey = () => state.metal === "Gold" ? state.carat : "Silver";
 
-  function rate() { return parseFloat($("metal").value === "Gold" ? $("goldRate").value : $("silverRate").value) || 0; }
-
-  function refresh() {
-    const gold = $("metal").value === "Gold";
-    $("goldFields").classList.toggle("hidden", !gold);
-    $("silverFields").classList.toggle("hidden", gold);
-    const r = rate();
-    $("rateInfo").textContent = gold
-      ? `📈 Current rate for ${$("carat").value}K gold: ${inr(r, 0)}/gram (${inr(r * 10, 0)}/10g)`
-      : `📈 Current silver rate: ${inr(r)}/gram (${inr(r * 10, 0)}/10g)`;
-    $("result").classList.add("hidden");
+  function pick(groupId, value) {
+    for (const b of $(groupId).children) b.classList.toggle("on", b.dataset.v === value);
   }
 
-  $("carat").onchange = () => {
-    $("caratLabel").textContent = $("carat").value;
-    $("goldRate").value = goldRates[$("carat").value];
-    refresh();
-  };
-  $("goldRate").oninput = () => { goldRates[$("carat").value] = $("goldRate").value; refresh(); };
-  ["metal", "silverRate", "weight", "makingPct", "makingPerGram"].forEach(id => $(id).oninput = refresh);
-  $("metal").onchange = refresh;
+  function load() {
+    const gold = state.metal === "Gold";
+    $("goldFields").classList.toggle("hidden", !gold);
+    $("rateLabel").textContent = gold ? `Gold Rate (${state.carat}K)` : "Silver Rate";
+    $("rate").value = state.rates[rateKey()];
+    $("rate").step = gold ? "1" : "0.1";
+    $("making").value = state.making[state.metal];
+    $("making").step = gold ? "0.1" : "1";
+    $("makingPre").classList.toggle("hidden", gold);
+    $("makingSuf").textContent = gold ? "%" : "/ gram";
+    $("makingHint").textContent = gold ? "25% discount on gold making charges" : "50% discount on silver making charges";
+    update();
+  }
 
-  $("calc").onclick = () => {
-    const metal = $("metal").value;
+  function update() {
+    const metal = state.metal, gold = metal === "Gold";
     const weight = parseFloat($("weight").value);
-    const r = rate();
-    const pct = parseFloat($("makingPct").value) || 0;
-    const perGram = parseFloat($("makingPerGram").value) || 0;
+    const rate = parseFloat($("rate").value);
+    const making = parseFloat($("making").value) || 0;
+    $("rateHint").textContent = rate > 0 ? `= ${inr(rate * 10, 0)} per 10 grams` : "";
     const out = $("result");
-    out.classList.remove("hidden");
-    if (!(weight > 0) || !(r > 0)) {
-      out.innerHTML = '<p class="err">Please enter a valid weight and rate.</p>';
+    if (!(weight > 0) || !(rate > 0)) {
+      out.innerHTML = '<div class="card"><p class="err">Enter a valid weight and rate</p></div>';
       return;
     }
-    const x = calculateFinalCost(weight, metal, r, pct, perGram);
-    const row = (k, v) => `<div class="row"><span>${k}</span><b>${v}</b></div>`;
+    const x = calculateFinalCost(weight, metal, rate, gold ? making : 0, gold ? 0 : making);
+    const row = (k, v, cls = "") => `<div class="row ${cls}"><span>${k}</span><b>${v}</b></div>`;
     out.innerHTML = `
-      <h2>Price Calculation</h2>
-      <div>Final Amount</div>
-      <div class="big">${inr(x.finalCost)}</div>
-      <div style="margin-bottom:12px">Including GST: ${inr(x.gst)} · You save ${inr(x.discount)} (${x.discountPercent} off making)</div>
-      <h2>Price Breakdown</h2>
-      ${row("Metal", metal + (metal === "Gold" ? ` (${$("carat").value}K)` : ""))}
-      ${row("Weight", weight + " grams")}
-      ${row("Rate", inr(r, metal === "Gold" ? 0 : 2) + "/gram")}
-      ${row("Base Cost", inr(x.baseCost))}
-      ${row("Making Charges", inr(x.making))}
-      ${row("After Discount", inr(x.discounted))}
-      ${row("Before GST", inr(x.beforeGst))}
-      ${row("GST (3%)", inr(x.gst))}
-      ${row("<b>Final Amount</b>", inr(x.finalCost))}`;
-    out.scrollIntoView({ behavior: "smooth" });
-  };
+      <div class="tiles">
+        <div class="tile final">
+          <div class="k">Final Amount</div>
+          <div class="v">${inr(x.finalCost)}</div>
+          <span class="pill">✓ Including GST: ${inr(x.gst)}</span>
+        </div>
+        <div class="tile save">
+          <div class="k">Discount Applied</div>
+          <div class="v">${inr(x.discount)}</div>
+          <span class="pill">↓ ${x.discountPercent} off making charges</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="title">Price Breakdown</h2>
+        ${row("Metal", metal + (gold ? ` (${state.carat}K)` : ""))}
+        ${row("Weight", weight + " grams")}
+        ${row("Rate", inr(rate, gold ? 0 : 2) + " / gram")}
+        ${row("Base Cost", inr(x.baseCost))}
+        ${row("Making Charges", inr(x.making))}
+        ${row(`Discount (${x.discountPercent})`, "− " + inr(x.discount), "minus")}
+        ${row("Making After Discount", inr(x.discounted))}
+        ${row("Before GST", inr(x.beforeGst))}
+        ${row("GST (3%)", inr(x.gst))}
+        ${row("Final Amount", inr(x.finalCost), "total")}
+      </div>`;
+  }
 
-  $("goldRate").value = goldRates[22];
-  refresh();
+  $("metal").onclick = e => { const v = e.target.dataset.v; if (v) { state.metal = v; pick("metal", v); load(); } };
+  $("carat").onclick = e => { const v = e.target.dataset.v; if (v) { state.carat = v; pick("carat", v); load(); } };
+  $("rate").oninput = () => { state.rates[rateKey()] = $("rate").value; update(); };
+  $("making").oninput = () => { state.making[state.metal] = $("making").value; update(); };
+  $("weight").oninput = update;
+
+  load();
 </script>
 </body>
 </html>
